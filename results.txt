@@ -1,0 +1,4 @@
+MyPlayer2 #1 : 3
+Ruleplayer #3 : 2
+Ruleplayer #2 : 1
+Ruleplayer #1 : 0
