@@ -234,8 +234,10 @@ public class BadugiRunner {
     public static void playThreeHandTournament() throws IOException {
         BadugiPlayer[] players = { 
             /* Replace these by instantiating your player classes */
-            new RuleBasedBadugiPlayer("Alice"), 
-            new RuleBasedBadugiPlayer("Bob")
+            //new RuleBasedBadugiPlayer("Alice"), 
+            //new RuleBasedBadugiPlayer("Bob")
+        	new IBadugi2("old"),
+        	new Badugi500574791("new")
         };
         Random rng;
         String seed = "This string is to be used as seed of secure random number generator";
@@ -258,13 +260,15 @@ public class BadugiRunner {
           "RuleBasedBadugiPlayer",  
           "RuleBasedBadugiPlayer",
           "MyBadugiPlayer",
+          "FirstBadugiSubmission",
           "Badugi500574791",
-          "IBadugiPlayer"
+          "IBadugi2"
         };
         
         PrintWriter out = new PrintWriter(System.out);
         PrintWriter result = new PrintWriter(new FileWriter("results.txt"));
         badugiTournament(playerClasses, out, result);
         result.close();
+    	//playThreeHandTournament();
     }   
 }

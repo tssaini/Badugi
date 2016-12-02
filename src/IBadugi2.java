@@ -1,24 +1,28 @@
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Random;
 
-public class IBadugiPlayer implements BadugiPlayer {
+public class IBadugi2 implements BadugiPlayer {
 	private static int count = 0;
 	private int id;
 	private String nick;
 	private int position;
 	private int totalRaises; // total number of bets and raises in the entire
+	private boolean bluff;
 	
-	boolean raise;
-								// hand
+	private int numberDroppedCards; // the number of hands I last dropped
+								
 	private Random rng = new Random();
 
-	public IBadugiPlayer() {
+	public IBadugi2() {
 		this.id = ++count;
+		
 	}
 
-	public IBadugiPlayer(String nick) {
+	public IBadugi2(String nick) {
 		this.nick = nick;
+		
 	}
 
 	private static String[][] thresholdString = {
@@ -49,10 +53,63 @@ public class IBadugiPlayer implements BadugiPlayer {
 	public void startNewHand(int position, int handsToGo, int currentScore) {
 		this.position = position;
 		totalRaises = 0;
-		raise = false;
+		numberDroppedCards = 0;
+		bluff = false;
+		
 	}
 
+	public int initialAction(BadugiHand hand){
+		List<Card> activeCards = hand.getActiveCards();
+		int activeSize = activeCards.size();
+		
+		//if two of your cards have a value of 4 or lower, they are off suit and there are no pairs, continue
+		int lessThan4 = 0;
+		if(activeSize > 1){
+			for(Card c: activeCards){
+				if(c.getRank() < 5){
+					lessThan4++;
+				}
+			}
+		}
+		if(lessThan4 > 1){
+			return 0;
+		}
+		
+		//three cards valued at 7 or lower and they are not suited or paired, continue
+		boolean lessThan7 = true;
+		if(activeSize > 2){
+			for(Card c: activeCards){
+				if(c.getRank() > 7){
+					lessThan7 = false;
+					break;
+				}
+			}
+			if(lessThan7)
+				return 0;
+			else
+				return -1;
+		}else{//else fold
+			return -1;
+		}
+		
+		
+	}
+	
 	public int bettingAction(int drawsRemaining, BadugiHand hand, int bets, int pot, int toCall, int opponentDrew) {
+		List<Card> activeCards = hand.getActiveCards();
+		int activeSize = activeCards.size();
+		
+		double ran = rng.nextDouble();
+		
+		
+		if (toCall > 0) {
+			totalRaises++;
+		}
+		//keep bluffing 
+		if(bluff && opponentDrew != 0){
+			//System.out.println("bluffing");
+			return 1;
+		}
 		
 		//A great way to bluff in Badugi is to stand pat on the draw rounds. 
 		//Players will start to assume that you have a powerful hand and there is no need to draw further cards. 
@@ -67,39 +124,81 @@ public class IBadugiPlayer implements BadugiPlayer {
 		//If you are going to semi-bluff, you should have at least a 4 card hand or a powerful 3 card hand like A-2-3 or else fold on anything else.
 		
 		
-		//if 4 card badugi and lower than 8, raise 
+		//if 4 card badugi and lower than 10, raise else keep playing
+		if(activeSize == 4){
+			boolean lowerThanT = true;
+			for(Card c : activeCards){
+				if(c.getRank() > 9){
+					lowerThanT = false;
+					break;
+				}
+			}
+			if(lowerThanT)
+				return 1;
+			else
+				return 0;
+		}
+		
+		//if he drew cards and you have a 4 hand badugi (doesnt work everytime)
+		if(activeSize == 4 && opponentDrew > 0){
+			bluff = true;
+			return 1;
+		}
+		
+		//detect dumb bluffs: if they are raising but drawing at the same time
+		//if opponent was raising last round but drew 2 cards after
+		if(totalRaises - bets > 1 && opponentDrew > 1){
+			//System.out.println("bluff detected");
+			return 0;
+		}
 		
 		
-		//if 4 card badugi and higher than 8, keep playing
 		
-		
-		//detect bluff: if they are raising but drawing at the same time
+		//keep doing the initial action as long as there is no one betting
+		if(totalRaises-1 < 1){
+			return initialAction(hand);
+		}
 		
 		
 		if(drawsRemaining == 3){//initial cards given
 			
-			//Straight bluffing is generally good to do early on in the game. traight bluff usually has a horrible hand that would lose if anyone called it
+			//Straight bluffing is generally good to do early on in the game. straight bluff usually has a horrible hand that would lose if anyone called it
+			/*if(ran < 0.3 && activeSize < 3){
+				bluff = true;
+				return 1;
+			}*/
+			
+			
 			
 			
 			//snowing can be done early and works well if players are drawing lots of cards on each round, indicating many weak hands that will probably fold.
 			
-			//if two of your cards have a value of 4 or lower, they are off suit and there are no pairs, continue
 			
-			//three cards valued at 7 or lower and they are not suited or paired, continue
-			
-			//else fold
-			
+			return initialAction(hand);
 			
 		}else if(drawsRemaining == 2){// 1 draw done 
+			
 			//you having a 3 card hand with cards less than seven and all the cards should be off-suited
 			
 			
-			 //If players are not drawing card in any round, then you should be cautious and try determining if they are bluffing or not
-			
+			//If players are not drawing card in any round, then you should be cautious and try determining if they are bluffing or not
+			if(ran < 0.7 && opponentDrew == 0){
+				return 0;
+			}
 			
 			
 			
 		}else if(drawsRemaining == 1){// 2 draws done
+			
+			
+			
+			if(activeSize  < 3){
+				return -1;
+			}
+			
+			if(ran < 0.7 && opponentDrew == 0){
+				return 0;
+			}
 			
 			//watch to see if another player has been betting and raising while drawing cards at the same time. 
 			//it may indicate that they have a powerful three card hand but not a badugi
@@ -109,6 +208,7 @@ public class IBadugiPlayer implements BadugiPlayer {
 			
 		}else if(drawsRemaining == 0){// no more draws
 			
+			
 			//If they stood pat on the last draw, there is a chance they do have a badugi hand.
 			
 			
@@ -117,9 +217,7 @@ public class IBadugiPlayer implements BadugiPlayer {
 		
 		
 		
-		if (toCall > 0) {
-			totalRaises++;
-		}
+		
 		int beatsIdx = 0;
 		if (opponentDrew < 0) {
 			opponentDrew = 0;
@@ -128,7 +226,7 @@ public class IBadugiPlayer implements BadugiPlayer {
 			beatsIdx++;
 		}
 		int off = beatsIdx - bets - totalRaises / 3 + position + opponentDrew - 2;
-		double ran = rng.nextDouble();
+		
 		if (off < 0) { // Looks like we are behind
 			if (ran < .6) {
 				return -1;
@@ -154,7 +252,7 @@ public class IBadugiPlayer implements BadugiPlayer {
 	}
 	//draws remaining: including this round
 	public List<Card> drawingAction(int drawsRemaining, BadugiHand hand, int pot, int dealerDrew) {
-		
+		List<Card> cardsToDrop;
 		//r1: when you have 3 cards and are drawing one card to find that last suit, the odds are roughly 25% that you will come through.
 		
 		//r2: When you have an off-suited four card hand with no card higher than a jack, then there is no need to draw.
@@ -164,7 +262,14 @@ public class IBadugiPlayer implements BadugiPlayer {
 		//This provides a great opportunity to bluff because of the additional knowledge you now know
 		
 		
-		return hand.getInactiveCards();
+		cardsToDrop = hand.getInactiveCards();
+		
+		numberDroppedCards = cardsToDrop.size(); 
+		
+		if(bluff){
+			return new ArrayList<Card>();
+		}
+		return cardsToDrop;
 	}
 
 	public void showdown(BadugiHand yourHand, BadugiHand opponentHand) {
@@ -174,7 +279,7 @@ public class IBadugiPlayer implements BadugiPlayer {
 		if (nick != null) {
 			return nick;
 		} else {
-			return "IBadugiPlayer";
+			return "IBadugi2";
 		}
 	}
 

@@ -1,5 +1,6 @@
-badugi player #1 : 8
-MyPlayer #1 : 6
-IBadugiPlayer : 4
-Ruleplayer #1 : 2
-Ruleplayer #2 : 0
+0ToA100 : 10
+badugi player #1 : 6
+IBadugi2 : 6
+Ruleplayer #2 : 4
+MyPlayer #1 : 4
+Ruleplayer #1 : 0
