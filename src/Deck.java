@@ -2,7 +2,7 @@ import java.util.*;
 
 /**
  * A class whose objects represent individual decks of cards. A deck is shuffled using
- * the given RNG when created, after which 
+ * the given RNG when created. 
  * @author Ilkka Kokkarinen
  */
 public class Deck {
@@ -18,22 +18,20 @@ public class Deck {
     }
 
     // The cards that are still in the deck.
-    private ArrayList<Card> currentCards;    
-    private Random rng;   
+    private ArrayList<Card> currentCards;      
     
     /**
      * Constructor for the class.
      * @param rng The random number generator used to shuffle the deck.
      */
     public Deck(Random rng) {
-        this.rng = new Random();
         currentCards = new ArrayList<Card>(52);
         for(Card c: cards) { currentCards.add(c); }
         Collections.shuffle(currentCards, rng);
     }
     
     /** 
-     * Draw one random card from the top of this deck.
+     * Draw one card from top of the deck.
      * @return The card that was drawn and removed from this deck.
      */
     public Card drawCard() {

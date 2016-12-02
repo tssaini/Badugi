@@ -34,7 +34,9 @@ public class BadugiHand implements Comparable<BadugiHand> {
     // Bug and fix found by Ilya Bakoulin Nov 6 2016
     private void updateActiveHand() {
         activeCards.clear();
-        Comparator<Card> comp = (c1, c2) -> c1.compareTo(c2);
+        Comparator<Card> comp = new Comparator<Card>() {
+            public int compare(Card c1, Card c2) { return c1.compareTo(c2); }
+        };
         Collections.sort(allCards, comp);
         backtrack(0, new ArrayList<Card>(4), activeCards);
         Collections.sort(activeCards, comp);
@@ -129,7 +131,7 @@ public class BadugiHand implements Comparable<BadugiHand> {
      * @param toReplace The card in this hand that is to be replaced with a drawn card.
      * @param deck The deck from which the new card is drawn.
      */
-    public void replaceCard(Card toReplace, Deck deck) {
+    public void replaceCard(Card toReplace, EfficientDeck deck) {
         int idx = 0;
         while(idx < 4 && !allCards.get(idx).equals(toReplace)) { idx++; }
         allCards.set(idx, deck.drawCard());
@@ -174,7 +176,7 @@ public class BadugiHand implements Comparable<BadugiHand> {
         Random rng = new Random();
         ArrayList<BadugiHand> hands = new ArrayList<BadugiHand>();
         for(int i = 0; i < 20; i++) {
-            Deck deck = new Deck(rng);
+            EfficientDeck deck = new EfficientDeck(rng);
             ArrayList<Card> cards = new ArrayList<Card>();
             for(int j = 0; j < 4; j++) {
                 cards.add(deck.drawCard());

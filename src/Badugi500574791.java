@@ -2,12 +2,7 @@ import java.util.Dictionary;
 import java.util.List;
 import java.util.Random;
 
-/**
- * A simple rule-based player for heads-up badugi.
- * 
- * @author Ilkka Kokkarinen
- */
-public class MyBadugiPlayer2 implements BadugiPlayer {
+public class Badugi500574791 implements BadugiPlayer {
 	private static int count = 0;
 	private int id;
 	private String nick;
@@ -18,11 +13,11 @@ public class MyBadugiPlayer2 implements BadugiPlayer {
 								// hand
 	private Random rng = new Random();
 
-	public MyBadugiPlayer2() {
+	public Badugi500574791() {
 		this.id = ++count;
 	}
 
-	public MyBadugiPlayer2(String nick) {
+	public Badugi500574791(String nick) {
 		this.nick = nick;
 	}
 
@@ -120,7 +115,7 @@ public class MyBadugiPlayer2 implements BadugiPlayer {
 		if (nick != null) {
 			return nick;
 		} else {
-			return "MyPlayer2 #" + id;
+			return "badugi player #" + id;
 		}
 	}
 

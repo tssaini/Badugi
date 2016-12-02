@@ -35,6 +35,9 @@ public class HumanBadugiPlayer implements BadugiPlayer
         if(dealerDrew > -1) { System.out.println("The opponent drew " + dealerDrew + " cards."); }
         System.out.println("Enter 4-letter string of 'd' and 'k' for draw and keep:");
         String ans = scanner.next().toLowerCase().trim();
+        if(ans.equals("all")) {
+            return new ArrayList<Card>(hand.getAllCards());
+        }
         ArrayList<Card> drawCards = new ArrayList<Card>();
         for(int i = 0; i < 4; i++) {
             if(ans.charAt(i) == 'd') { drawCards.add(hand.getAllCards().get(i)); }
